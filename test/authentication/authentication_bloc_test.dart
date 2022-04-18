@@ -1,23 +1,19 @@
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_login/authentication/authentication.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:user_repository/user_repository.dart';
 
-class MockAuthenticationRepository extends Mock
-    implements AuthenticationRepository {}
+class MockAuthenticationRepository extends Mock implements UserRepository {}
 
 class MockUserRepository extends Mock implements UserRepository {}
 
 void main() {
   const user = User('id');
-  late AuthenticationRepository authenticationRepository;
   late UserRepository userRepository;
 
   setUp(() {
-    authenticationRepository = MockAuthenticationRepository();
-    when(() => authenticationRepository.status)
+    when(() => userRepository.loginStatus)
         .thenAnswer((_) => const Stream.empty());
     userRepository = MockUserRepository();
   });
@@ -25,7 +21,6 @@ void main() {
   group('AuthenticationBloc', () {
     test('initial state is AuthenticationState.unknown', () {
       final authenticationBloc = AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       );
       expect(authenticationBloc.state, const AuthenticationState.unknown());
@@ -35,12 +30,11 @@ void main() {
     blocTest<AuthenticationBloc, AuthenticationState>(
       'emits [unauthenticated] when status is unauthenticated',
       setUp: () {
-        when(() => authenticationRepository.status).thenAnswer(
-          (_) => Stream.value(AuthenticationStatus.unauthenticated),
+        when(() => userRepository.loginStatus).thenAnswer(
+          (_) => Stream.value(UserLoginStatus.unauthenticated),
         );
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       expect: () => const <AuthenticationState>[
@@ -51,13 +45,12 @@ void main() {
     blocTest<AuthenticationBloc, AuthenticationState>(
       'emits [authenticated] when status is authenticated',
       setUp: () {
-        when(() => authenticationRepository.status).thenAnswer(
-          (_) => Stream.value(AuthenticationStatus.authenticated),
+        when(() => userRepository.loginStatus).thenAnswer(
+          (_) => Stream.value(UserLoginStatus.authenticated),
         );
         when(() => userRepository.getUser()).thenAnswer((_) async => user);
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       expect: () => const <AuthenticationState>[
@@ -70,17 +63,16 @@ void main() {
     blocTest<AuthenticationBloc, AuthenticationState>(
       'emits [authenticated] when status is authenticated',
       setUp: () {
-        when(() => authenticationRepository.status).thenAnswer(
-          (_) => Stream.value(AuthenticationStatus.authenticated),
+        when(() => userRepository.loginStatus).thenAnswer(
+          (_) => Stream.value(UserLoginStatus.authenticated),
         );
         when(() => userRepository.getUser()).thenAnswer((_) async => user);
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(
-        const AuthenticationStatusChanged(AuthenticationStatus.authenticated),
+        const AuthenticationStatusChanged(UserLoginStatus.authenticated),
       ),
       expect: () => const <AuthenticationState>[
         AuthenticationState.authenticated(user),
@@ -90,16 +82,15 @@ void main() {
     blocTest<AuthenticationBloc, AuthenticationState>(
       'emits [unauthenticated] when status is unauthenticated',
       setUp: () {
-        when(() => authenticationRepository.status).thenAnswer(
-          (_) => Stream.value(AuthenticationStatus.unauthenticated),
+        when(() => userRepository.loginStatus).thenAnswer(
+          (_) => Stream.value(UserLoginStatus.unauthenticated),
         );
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(
-        const AuthenticationStatusChanged(AuthenticationStatus.unauthenticated),
+        const AuthenticationStatusChanged(UserLoginStatus.unauthenticated),
       ),
       expect: () => const <AuthenticationState>[
         AuthenticationState.unauthenticated(),
@@ -112,11 +103,10 @@ void main() {
         when(() => userRepository.getUser()).thenThrow(Exception('oops'));
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(
-        const AuthenticationStatusChanged(AuthenticationStatus.authenticated),
+        const AuthenticationStatusChanged(UserLoginStatus.authenticated),
       ),
       expect: () => const <AuthenticationState>[
         AuthenticationState.unauthenticated(),
@@ -130,11 +120,10 @@ void main() {
         when(() => userRepository.getUser()).thenAnswer((_) async => null);
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(
-        const AuthenticationStatusChanged(AuthenticationStatus.authenticated),
+        const AuthenticationStatusChanged(UserLoginStatus.authenticated),
       ),
       expect: () => const <AuthenticationState>[
         AuthenticationState.unauthenticated(),
@@ -144,16 +133,15 @@ void main() {
     blocTest<AuthenticationBloc, AuthenticationState>(
       'emits [unknown] when status is unknown',
       setUp: () {
-        when(() => authenticationRepository.status).thenAnswer(
-          (_) => Stream.value(AuthenticationStatus.unknown),
+        when(() => userRepository.loginStatus).thenAnswer(
+          (_) => Stream.value(UserLoginStatus.unknown),
         );
       },
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(
-        const AuthenticationStatusChanged(AuthenticationStatus.unknown),
+        const AuthenticationStatusChanged(UserLoginStatus.unknown),
       ),
       expect: () => const <AuthenticationState>[
         AuthenticationState.unknown(),
@@ -163,15 +151,14 @@ void main() {
 
   group('AuthenticationLogoutRequested', () {
     blocTest<AuthenticationBloc, AuthenticationState>(
-      'calls logOut on authenticationRepository '
+      'calls logOut on userRepository '
       'when AuthenticationLogoutRequested is added',
       build: () => AuthenticationBloc(
-        authenticationRepository: authenticationRepository,
         userRepository: userRepository,
       ),
       act: (bloc) => bloc.add(AuthenticationLogoutRequested()),
       verify: (_) {
-        verify(() => authenticationRepository.logOut()).called(1);
+        verify(() => userRepository.logOut()).called(1);
       },
     );
   });

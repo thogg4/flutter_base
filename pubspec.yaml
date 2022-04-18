@@ -10,10 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^8.0.1
-  formz: ^0.4.0
   equatable: ^2.0.0
-  authentication_repository:
-    path: packages/authentication_repository
+  shared_preferences: ^2.0.13
   user_repository:
     path: packages/user_repository
 

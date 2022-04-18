@@ -1,9 +1,11 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_login/login/login.dart';
+import 'package:flutter_login/login/bloc/login_bloc.dart';
+import 'package:flutter_login/login/bloc/login_event.dart';
+import 'package:flutter_login/login/bloc/login_state.dart';
+import 'package:flutter_login/login/view/login_form.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:formz/formz.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockLoginBloc extends MockBloc<LoginEvent, LoginState>
@@ -85,7 +87,7 @@ void main() {
         'loading indicator is shown when status is submission in progress',
         (tester) async {
       when(() => loginBloc.state).thenReturn(
-        const LoginState(status: FormzStatus.submissionInProgress),
+        const LoginState(status: 'submitting'),
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -104,7 +106,7 @@ void main() {
     testWidgets('continue button is enabled when status is validated',
         (tester) async {
       when(() => loginBloc.state).thenReturn(
-        const LoginState(status: FormzStatus.valid),
+        const LoginState(status: 'valid'),
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -123,7 +125,7 @@ void main() {
     testWidgets('LoginSubmitted is added to LoginBloc when continue is tapped',
         (tester) async {
       when(() => loginBloc.state).thenReturn(
-        const LoginState(status: FormzStatus.valid),
+        const LoginState(status: 'valid'),
       );
       await tester.pumpWidget(
         MaterialApp(
@@ -144,12 +146,12 @@ void main() {
       whenListen(
         loginBloc,
         Stream.fromIterable([
-          const LoginState(status: FormzStatus.submissionInProgress),
-          const LoginState(status: FormzStatus.submissionFailure),
+          const LoginState(status: 'submitting'),
+          const LoginState(status: 'failure'),
         ]),
       );
       when(() => loginBloc.state).thenReturn(
-        const LoginState(status: FormzStatus.submissionFailure),
+        const LoginState(status: 'failure'),
       );
       await tester.pumpWidget(
         MaterialApp(

@@ -1,32 +1,28 @@
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
-import 'package:flutter_login/login/login.dart';
-import 'package:formz/formz.dart';
-
-part 'login_event.dart';
-part 'login_state.dart';
+import 'package:flutter_login/login/bloc/login_event.dart';
+import 'package:flutter_login/login/bloc/login_state.dart';
+import 'package:flutter_login/login/models/password.dart';
+import 'package:flutter_login/login/models/username.dart';
+import 'package:user_repository/user_repository.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   LoginBloc({
-    required AuthenticationRepository authenticationRepository,
-  })  : _authenticationRepository = authenticationRepository,
+    required UserRepository userRepository,
+  })  : _userRepository = userRepository,
         super(const LoginState()) {
     on<LoginUsernameChanged>(_onUsernameChanged);
     on<LoginPasswordChanged>(_onPasswordChanged);
     on<LoginSubmitted>(_onSubmitted);
   }
 
-  final AuthenticationRepository _authenticationRepository;
+  final UserRepository _userRepository;
 
   void _onUsernameChanged(
-    LoginUsernameChanged event,
-    Emitter<LoginState> emit,
-  ) {
+      LoginUsernameChanged event, Emitter<LoginState> emit) {
     final username = Username.dirty(event.username);
     emit(state.copyWith(
       username: username,
-      status: Formz.validate([state.password, username]),
+      status: 'usernameChecked',
     ));
   }
 
@@ -37,7 +33,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     final password = Password.dirty(event.password);
     emit(state.copyWith(
       password: password,
-      status: Formz.validate([password, state.username]),
+      status: 'passwordChecked',
     ));
   }
 
@@ -45,16 +41,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     LoginSubmitted event,
     Emitter<LoginState> emit,
   ) async {
-    if (state.status.isValidated) {
-      emit(state.copyWith(status: FormzStatus.submissionInProgress));
+    if (state.status == 'passwordChecked') {
+      emit(state.copyWith(status: 'submitting'));
       try {
-        await _authenticationRepository.logIn(
+        await _userRepository.logIn(
           username: state.username.value,
           password: state.password.value,
         );
-        emit(state.copyWith(status: FormzStatus.submissionSuccess));
+        emit(state.copyWith(status: 'success'));
       } catch (_) {
-        emit(state.copyWith(status: FormzStatus.submissionFailure));
+        emit(state.copyWith(status: 'failure'));
       }
     }
   }

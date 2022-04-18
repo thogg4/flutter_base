@@ -1,18 +1,20 @@
-part of 'login_bloc.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_login/login/models/password.dart';
+import 'package:flutter_login/login/models/username.dart';
 
 class LoginState extends Equatable {
   const LoginState({
-    this.status = FormzStatus.pure,
+    this.status = 'unknown',
     this.username = const Username.pure(),
     this.password = const Password.pure(),
   });
 
-  final FormzStatus status;
+  final String status;
   final Username username;
   final Password password;
 
   LoginState copyWith({
-    FormzStatus? status,
+    String? status,
     Username? username,
     Password? password,
   }) {

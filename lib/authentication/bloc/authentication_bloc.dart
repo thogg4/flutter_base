@@ -1,6 +1,4 @@
 import 'dart:async';
-
-import 'package:authentication_repository/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:user_repository/user_repository.dart';
@@ -11,27 +9,22 @@ part 'authentication_state.dart';
 class AuthenticationBloc
     extends Bloc<AuthenticationEvent, AuthenticationState> {
   AuthenticationBloc({
-    required AuthenticationRepository authenticationRepository,
     required UserRepository userRepository,
-  })  : _authenticationRepository = authenticationRepository,
-        _userRepository = userRepository,
+  })  : _userRepository = userRepository,
         super(const AuthenticationState.unknown()) {
     on<AuthenticationStatusChanged>(_onAuthenticationStatusChanged);
     on<AuthenticationLogoutRequested>(_onAuthenticationLogoutRequested);
-    _authenticationStatusSubscription = _authenticationRepository.status.listen(
+    _authenticationStatusSubscription = _userRepository.loginStatus.listen(
       (status) => add(AuthenticationStatusChanged(status)),
     );
   }
 
-  final AuthenticationRepository _authenticationRepository;
   final UserRepository _userRepository;
-  late StreamSubscription<AuthenticationStatus>
-      _authenticationStatusSubscription;
+  late StreamSubscription<UserLoginStatus> _authenticationStatusSubscription;
 
   @override
   Future<void> close() {
     _authenticationStatusSubscription.cancel();
-    _authenticationRepository.dispose();
     return super.close();
   }
 
@@ -40,9 +33,9 @@ class AuthenticationBloc
     Emitter<AuthenticationState> emit,
   ) async {
     switch (event.status) {
-      case AuthenticationStatus.unauthenticated:
+      case UserLoginStatus.unauthenticated:
         return emit(const AuthenticationState.unauthenticated());
-      case AuthenticationStatus.authenticated:
+      case UserLoginStatus.authenticated:
         final user = await _tryGetUser();
         return emit(user != null
             ? AuthenticationState.authenticated(user)
@@ -56,7 +49,7 @@ class AuthenticationBloc
     AuthenticationLogoutRequested event,
     Emitter<AuthenticationState> emit,
   ) {
-    _authenticationRepository.logOut();
+    _userRepository.logOut();
   }
 
   Future<User?> _tryGetUser() async {

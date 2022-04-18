@@ -5,14 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flutter: Attach to Device",
-            "type": "dart",
-            "request": "attach"
-        },
-        {
             "name": "deseret",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "lib/main.dart"
         },
         {
             "name": "deseret (profile mode)",
@@ -25,12 +21,6 @@
             "request": "launch",
             "type": "dart",
             "flutterMode": "release"
-        },
-        {
-            "name": "authentication_repository",
-            "cwd": "packages/authentication_repository",
-            "request": "launch",
-            "type": "dart"
         },
         {
             "name": "user_repository",

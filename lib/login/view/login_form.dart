@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_login/login/login.dart';
-import 'package:formz/formz.dart';
+import 'package:flutter_login/login/bloc/login_bloc.dart';
+import 'package:flutter_login/login/bloc/login_event.dart';
+import 'package:flutter_login/login/bloc/login_state.dart';
 
 class LoginForm extends StatelessWidget {
   @override
@@ -34,7 +35,8 @@ class _UsernameInput extends StatelessWidget {
               context.read<LoginBloc>().add(LoginUsernameChanged(username)),
           decoration: InputDecoration(
             labelText: 'username',
-            errorText: state.username.invalid ? 'invalid username' : null,
+            errorText:
+                state.username.status == 'pure' ? null : 'invalid username',
           ),
         );
       },
@@ -55,7 +57,8 @@ class _PasswordInput extends StatelessWidget {
           obscureText: true,
           decoration: InputDecoration(
             labelText: 'password',
-            errorText: state.password.invalid ? 'invalid password' : null,
+            errorText:
+                state.password.status == 'pure' ? null : 'invalid password',
           ),
         );
       },
@@ -69,12 +72,12 @@ class _LoginButton extends StatelessWidget {
     return BlocBuilder<LoginBloc, LoginState>(
       buildWhen: (previous, current) => previous.status != current.status,
       builder: (context, state) {
-        return state.status.isSubmissionInProgress
+        return state.status == 'submitting'
             ? const CircularProgressIndicator()
             : ElevatedButton(
                 key: const Key('loginForm_continue_raisedButton'),
                 child: const Text('Login'),
-                onPressed: state.status.isValidated
+                onPressed: state.status == 'passwordChecked'
                     ? () {
                         context.read<LoginBloc>().add(const LoginSubmitted());
                       }
