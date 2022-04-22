@@ -1,10 +1,12 @@
+// ignore_for_file: implementation_imports
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_login/authentication/authentication.dart';
 import 'package:flutter_login/home/view/home_page.dart';
 import 'package:flutter_login/login/view/view.dart';
+import 'package:flutter_login/repositories/user_repository/lib/src/user_repository.dart';
 import 'package:flutter_login/splash/splash.dart';
-import 'package:user_repository/user_repository.dart';
 
 class App extends StatelessWidget {
   const App({

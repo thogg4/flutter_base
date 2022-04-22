@@ -4,9 +4,9 @@ import 'package:flutter_login/login/bloc/login_event.dart';
 import 'package:flutter_login/login/bloc/login_state.dart';
 import 'package:flutter_login/login/models/password.dart';
 import 'package:flutter_login/login/models/username.dart';
+import 'package:flutter_login/repositories/user_repository/lib/src/user_repository.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:user_repository/user_repository.dart';
 
 class MockuserRepository extends Mock implements UserRepository {}
 

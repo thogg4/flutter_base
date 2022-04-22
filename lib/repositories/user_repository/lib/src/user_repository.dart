@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
-import 'models/models.dart';
+import 'models/user.dart';
 
 enum UserLoginStatus { unknown, authenticated, unauthenticated }
 

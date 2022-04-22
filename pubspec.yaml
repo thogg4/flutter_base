@@ -12,8 +12,6 @@ dependencies:
   flutter_bloc: ^8.0.1
   equatable: ^2.0.0
   shared_preferences: ^2.0.13
-  user_repository:
-    path: packages/user_repository
 
 dev_dependencies:
   flutter_test:
